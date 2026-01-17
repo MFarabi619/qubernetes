@@ -14,7 +14,6 @@
 #define BUFFER_SIZE 4096
 #define WS_MAGIC_STRING "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 
-// SHA-1 implementation (pure C)
 typedef struct {
     uint32_t state[5];
     uint32_t count[2];
@@ -130,7 +129,7 @@ void sha1_final(uint8_t digest[20], SHA1_CTX *ctx) {
     }
 }
 
-// Base64 encoding (pure C)
+// Base64 encoding (
 static const char base64_chars[] = 
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -289,7 +288,8 @@ void handle_connection(int client_sock) {
             while (1) {
                 generate_metrics(metrics, sizeof(metrics));
                 if (ws_send_frame(client_sock, metrics) < 0) {
-                    break; // Stop when client disconnects
+                    printf("WebSocket client disconnected\n");
+                    break; 
                 }
                 sleep(2);
             }
@@ -323,7 +323,8 @@ void handle_connection(int client_sock) {
                 while (1) {
                     generate_metrics(metrics, sizeof(metrics));
                     if (ws_send_frame(client_sock, metrics) < 0) {
-                        break; // Stop when client disconnects
+                        printf("WebSocket client disconnected on /metrics\n");
+                        break; 
                     }
                     sleep(2);
                 }
@@ -341,9 +342,11 @@ void handle_connection(int client_sock) {
             "<h1>QNX Metrics Server</h1>"
             "<pre id='m'>Connecting...</pre>"
                 "<script>"
-                "function connect(){"
+<                "function connect(){"
                 "  var w=new WebSocket('ws://'+location.host);"
                 "  w.onmessage=function(e){document.getElementById('m').textContent=e.data};"
+                "  w.onclose=function(){document.getElementById('m').textContent='Disconnected.';};"
+                "  w.onerror=function(){document.getElementById('m').textContent='Connection error.';};"
                 "}"
                 "connect();"
                 "</script></body></html>";
@@ -352,6 +355,11 @@ void handle_connection(int client_sock) {
     }
     
     close(client_sock);
+}
+
+void sigchld_handler(int s) {
+    (void)s;
+    while (waitpid(-1, NULL, WNOHANG) > 0);
 }
 
 int main() {
@@ -363,6 +371,8 @@ int main() {
 
     // Ignore SIGPIPE so a disconnected WebSocket client doesn't kill the server
     signal(SIGPIPE, SIG_IGN);
+
+    signal(SIGCHLD, sigchld_handler);
     
     server_sock = socket(AF_INET, SOCK_STREAM, 0);
     if (server_sock < 0) {
@@ -403,8 +413,20 @@ int main() {
             perror("Accept failed");
             continue;
         }
+
+        pid_t pid = fork();
+        if (pid < 0) {
+            perror("Fork failed");
+            close(client_sock);
+            continue;
+        } else if (pid == 0) {
+            close(server_sock); 
+            handle_connection(client_sock);
+            exit(0);
+        } else {
+            close(client_sock);
+        }
         
-        handle_connection(client_sock);
     }
     
     close(server_sock);
