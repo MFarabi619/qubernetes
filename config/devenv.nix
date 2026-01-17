@@ -7,11 +7,11 @@
 }:
 
 {
-  env.GREET = "devenv";
-
-  packages = with pkgs; [
-    platformio
+  imports = [
+    ./packages.nix
   ];
+
+  env.GREET = "devenv";
 
   # languages.rust.enable = true;
 
