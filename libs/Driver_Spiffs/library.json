@@ -1,0 +1,18 @@
+{
+  "$schema": "https://raw.githubusercontent.com/platformio/platformio-core/develop/platformio/assets/schema/library.json",
+  "version": "0.0.1",
+  "license": "LGPL-3.0",
+  "frameworks": "arduino",
+  "name": "Driver_Spiffs",
+  "platforms": "espressif32",
+  "authors": {
+    "name": "Mumtahin Farabi",
+    "url": "https://github.com/MFarabi619",
+    "maintainer": true
+  },
+  "dependencies": [
+    {
+      "name": "SPIFFS"
+    }
+  ]
+}
