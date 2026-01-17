@@ -3,75 +3,576 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Qubernetes</title>
+    <title>Qubernetes - IoT Control Dashboard</title>
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="description" content="Qubernetes IoT Control Dashboard">
 
     <link rel="icon" href="https://avatars.githubusercontent.com/u/29576842?s=200&v=4">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5/themes.css" rel="stylesheet" type="text/css" />
+
+    <style>
+        /* Custom animations */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 5px currentColor, 0 0 10px currentColor; }
+            50% { box-shadow: 0 0 20px currentColor, 0 0 30px currentColor; }
+        }
+        
+        .status-on {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #a855f7, #6366f1, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
 </head>
 
-<body>
-    <main class="pt-24">
-
-        Hello World!
-        <div class="mt-4">
-            <button id="toggle-btn" class="btn btn-primary w-full">Turn ON</button>
+<body class="min-h-screen bg-base-200">
+    <!-- Navbar -->
+    <nav class="navbar bg-base-100/80 backdrop-blur-md fixed top-0 z-50 shadow-lg border-b border-base-300">
+        <div class="navbar-start">
+            <div class="dropdown">
+                <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
+                    </svg>
+                </div>
+                <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow-xl">
+                    <li><a href="#dashboard">Dashboard</a></li>
+                    <li><a href="#terminal">Terminal</a></li>
+                    <li><a href="#docs">Documentation</a></li>
+                </ul>
+            </div>
+            <a href="/" class="btn btn-ghost text-xl gap-2">
+                <img src="https://avatars.githubusercontent.com/u/29576842?s=200&v=4" alt="Logo" class="w-8 h-8 rounded-lg">
+                <span class="gradient-text font-bold">Qubernetes</span>
+            </a>
         </div>
+        <div class="navbar-center hidden lg:flex">
+            <ul class="menu menu-horizontal px-1 gap-2">
+                <li><a href="#dashboard" class="rounded-lg">📊 Dashboard</a></li>
+                <li><a href="#terminal" class="rounded-lg">💻 Terminal</a></li>
+                <li><a href="https://github.com/MFarabi619/qubernetes" target="_blank" class="rounded-lg">📚 Docs</a></li>
+            </ul>
+        </div>
+        <div class="navbar-end gap-2">
+            <div class="badge badge-outline gap-1" id="connection-status">
+                <span class="w-2 h-2 rounded-full bg-success animate-pulse"></span>
+                Connected
+            </div>
+            <label class="swap swap-rotate btn btn-ghost btn-circle">
+                <input type="checkbox" id="theme-toggle" />
+                <svg class="swap-on h-6 w-6 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M5.64,17l-.71.71a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0l.71-.71A1,1,0,0,0,5.64,17ZM5,12a1,1,0,0,0-1-1H3a1,1,0,0,0,0,2H4A1,1,0,0,0,5,12Zm7-7a1,1,0,0,0,1-1V3a1,1,0,0,0-2,0V4A1,1,0,0,0,12,5ZM5.64,7.05a1,1,0,0,0,.7.29,1,1,0,0,0,.71-.29,1,1,0,0,0,0-1.41l-.71-.71A1,1,0,0,0,4.93,6.34Zm12,.29a1,1,0,0,0,.7-.29l.71-.71a1,1,0,1,0-1.41-1.41L17,5.64a1,1,0,0,0,0,1.41A1,1,0,0,0,17.66,7.34ZM21,11H20a1,1,0,0,0,0,2h1a1,1,0,0,0,0-2Zm-9,8a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V20A1,1,0,0,0,12,19ZM18.36,17A1,1,0,0,0,17,18.36l.71.71a1,1,0,0,0,1.41,0,1,1,0,0,0,0-1.41ZM12,6.5A5.5,5.5,0,1,0,17.5,12,5.51,5.51,0,0,0,12,6.5Zm0,9A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z" />
+                </svg>
+                <svg class="swap-off h-6 w-6 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Z" />
+                </svg>
+            </label>
+        </div>
+    </nav>
 
-        <div
-            class="mx-auto my-20 self-center mockup-browser border border-base-300 max-w-3xl lg:max-w-7xl min-h-screen">
-            <div class="mockup-browser-toolbar">
-                <div class="input">http://localhost/webserial</div>
+    <main class="pt-20">
+        <!-- Hero Section -->
+        <section class="hero min-h-[40vh] bg-gradient-to-br from-base-300 via-base-200 to-base-300">
+            <div class="hero-content text-center">
+                <div class="max-w-2xl">
+                    <div class="float-animation mb-6">
+                        <img src="https://avatars.githubusercontent.com/u/29576842?s=200&v=4" alt="Qubernetes Logo" class="w-24 h-24 mx-auto rounded-2xl shadow-2xl">
+                    </div>
+                    <h1 class="text-5xl font-bold mb-4">
+                        Welcome to <span class="gradient-text">Qubernetes</span>
+                    </h1>
+                    <p class="text-base-content/70 text-lg mb-8">
+                        Your unified IoT control dashboard. Manage devices, monitor status, and interact with your hardware seamlessly.
+                    </p>
+                    <div class="flex justify-center gap-4 flex-wrap">
+                        <a href="#dashboard" class="btn btn-primary btn-lg gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            Get Started
+                        </a>
+                        <a href="#terminal" class="btn btn-outline btn-lg gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Open Terminal
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="container mx-auto px-4 py-12">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="h-1 w-12 bg-primary rounded-full"></div>
+                <h2 class="text-3xl font-bold">Control Panel</h2>
             </div>
 
-            <iframe src="/webserial" class="w-full min-h-screen" title="Web Serial" allowfullscreen="true"
-                loading="lazy">
-            </iframe>
-        </div>
+            <!-- Stats Row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div class="stat bg-base-100 rounded-2xl shadow-lg">
+                    <div class="stat-figure text-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                        </svg>
+                    </div>
+                    <div class="stat-title">GPIO State</div>
+                    <div class="stat-value text-primary" id="state-display">--</div>
+                    <div class="stat-desc">Current pin state</div>
+                </div>
 
+                <div class="stat bg-base-100 rounded-2xl shadow-lg">
+                    <div class="stat-figure text-secondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <div class="stat-title">Power</div>
+                    <div class="stat-value text-secondary" id="power-status">Active</div>
+                    <div class="stat-desc">System status</div>
+                </div>
+
+                <div class="stat bg-base-100 rounded-2xl shadow-lg">
+                    <div class="stat-figure text-accent">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="stat-title">Uptime</div>
+                    <div class="stat-value text-accent" id="uptime">0:00</div>
+                    <div class="stat-desc">Session duration</div>
+                </div>
+
+                <div class="stat bg-base-100 rounded-2xl shadow-lg">
+                    <div class="stat-figure text-info">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
+                        </svg>
+                    </div>
+                    <div class="stat-title">Network</div>
+                    <div class="stat-value text-info">OK</div>
+                    <div class="stat-desc">Connection stable</div>
+                </div>
+            </div>
+
+            <!-- Main Control Card -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- GPIO Control -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h3 class="card-title gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            GPIO Control
+                        </h3>
+                        <p class="text-base-content/60">Toggle the GPIO pin state</p>
+
+                        <div class="flex items-center justify-center py-8">
+                            <div class="relative">
+                                <!-- Status Indicator Ring -->
+                                <div id="status-ring" class="absolute inset-0 rounded-full opacity-30 transition-all duration-500"></div>
+                                <!-- Power Button -->
+                                <button id="toggle-btn" class="btn btn-circle btn-lg w-24 h-24 text-2xl transition-all duration-300 hover:scale-105 active:scale-95">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a5 5 0 01-7.072-7.072m7.072 7.072L9.172 12m5.656 0a2 2 0 00-2.828-2.828m0 0L9.172 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="card-actions justify-center">
+                            <span id="toggle-label" class="badge badge-lg badge-outline">Press to toggle</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h3 class="card-title gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                            </svg>
+                            Quick Actions
+                        </h3>
+                        <p class="text-base-content/60">Common operations</p>
+
+                        <div class="grid grid-cols-2 gap-3 mt-4">
+                            <button class="btn btn-outline btn-success gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                Refresh
+                            </button>
+                            <button class="btn btn-outline btn-warning gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                Reset
+                            </button>
+                            <button class="btn btn-outline btn-info gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Logs
+                            </button>
+                            <button class="btn btn-outline btn-error gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                Stop All
+                            </button>
+                        </div>
+
+                        <div class="divider">Activity</div>
+
+                        <div class="space-y-2 max-h-32 overflow-y-auto" id="activity-log">
+                            <div class="text-sm text-base-content/50 flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-success"></span>
+                                System initialized
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Info -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h3 class="card-title gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            System Info
+                        </h3>
+
+                        <div class="space-y-4 mt-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>CPU Usage</span>
+                                    <span id="cpu-usage">23%</span>
+                                </div>
+                                <progress class="progress progress-primary w-full" value="23" max="100"></progress>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>Memory</span>
+                                    <span id="mem-usage">45%</span>
+                                </div>
+                                <progress class="progress progress-secondary w-full" value="45" max="100"></progress>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>Storage</span>
+                                    <span id="storage-usage">67%</span>
+                                </div>
+                                <progress class="progress progress-accent w-full" value="67" max="100"></progress>
+                            </div>
+                        </div>
+
+                        <div class="divider">Details</div>
+
+                        <div class="text-sm space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-base-content/60">Platform</span>
+                                <span class="font-mono">ESP32</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-base-content/60">Version</span>
+                                <span class="font-mono">1.0.0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-base-content/60">IP Address</span>
+                                <span class="font-mono">192.168.1.x</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Terminal Section -->
+        <section id="terminal" class="container mx-auto px-4 py-12">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="h-1 w-12 bg-secondary rounded-full"></div>
+                <h2 class="text-3xl font-bold">Web Serial Terminal</h2>
+            </div>
+
+            <div class="glass-card rounded-3xl overflow-hidden shadow-2xl">
+                <div class="mockup-browser border-0 bg-base-300">
+                    <div class="mockup-browser-toolbar">
+                        <div class="flex items-center gap-2 px-4">
+                            <div class="w-3 h-3 rounded-full bg-error"></div>
+                            <div class="w-3 h-3 rounded-full bg-warning"></div>
+                            <div class="w-3 h-3 rounded-full bg-success"></div>
+                        </div>
+                        <div class="input border-0 bg-base-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                            http://localhost/webserial
+                        </div>
+                        <div class="flex items-center gap-2 px-4">
+                            <button class="btn btn-ghost btn-xs btn-circle" onclick="document.getElementById('serial-frame').contentWindow.location.reload()">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                            </button>
+                            <button class="btn btn-ghost btn-xs btn-circle" onclick="window.open('/webserial', '_blank')">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-base-100 p-1">
+                        <iframe 
+                            id="serial-frame"
+                            src="/webserial" 
+                            class="w-full min-h-[500px] rounded-lg" 
+                            title="Web Serial Terminal" 
+                            allowfullscreen="true"
+                            loading="lazy">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="container mx-auto px-4 py-12">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="h-1 w-12 bg-accent rounded-full"></div>
+                <h2 class="text-3xl font-bold">Features</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow">
+                    <div class="card-body items-center text-center">
+                        <div class="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                        <h3 class="card-title">Real-time Control</h3>
+                        <p class="text-base-content/60">Instant GPIO toggling with live status updates and feedback.</p>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow">
+                    <div class="card-body items-center text-center">
+                        <div class="w-16 h-16 rounded-2xl bg-secondary/10 flex items-center justify-center mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <h3 class="card-title">Web Serial</h3>
+                        <p class="text-base-content/60">Built-in terminal for direct communication with your device.</p>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow">
+                    <div class="card-body items-center text-center">
+                        <div class="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                        </div>
+                        <h3 class="card-title">Secure & Fast</h3>
+                        <p class="text-base-content/60">Lightweight design with responsive controls and secure connections.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
+
+    <!-- Footer -->
+    <footer class="footer footer-center p-10 bg-base-200 text-base-content border-t border-base-300">
+        <aside>
+            <img src="https://avatars.githubusercontent.com/u/29576842?s=200&v=4" alt="Qubernetes Logo" class="w-12 h-12 rounded-xl mb-2">
+            <p class="font-bold text-lg">Qubernetes</p>
+            <p class="text-base-content/60">IoT Control Dashboard</p>
+            <p class="text-sm text-base-content/40 mt-2">Built with ❤️ using DaisyUI & Tailwind CSS</p>
+        </aside>
+        <nav>
+            <div class="grid grid-flow-col gap-4">
+                <a href="https://github.com" target="_blank" class="btn btn-ghost btn-circle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                </a>
+                <a href="#" class="btn btn-ghost btn-circle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                </a>
+            </div>
+        </nav>
+    </footer>
+
     <script>
-        const button = document.getElementById('toggle-btn');
-        const stateDisplay = document.getElementById('state-display');
+        // State management
+        const state = {
+            gpioState: 0,
+            busy: false,
+            startTime: Date.now()
+        };
 
-        let busy = false;
+        // DOM Elements
+        const elements = {
+            button: document.getElementById('toggle-btn'),
+            stateDisplay: document.getElementById('state-display'),
+            toggleLabel: document.getElementById('toggle-label'),
+            statusRing: document.getElementById('status-ring'),
+            activityLog: document.getElementById('activity-log'),
+            uptime: document.getElementById('uptime'),
+            themeToggle: document.getElementById('theme-toggle')
+        };
 
+        // Utility Functions
+        function formatTime(ms) {
+            const seconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            if (hours > 0) {
+                return `${hours}:${String(minutes % 60).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
+            }
+            return `${minutes}:${String(seconds % 60).padStart(2, '0')}`;
+        }
+
+        function addActivityLog(message, type = 'info') {
+            const colors = {
+                info: 'bg-info',
+                success: 'bg-success',
+                warning: 'bg-warning',
+                error: 'bg-error'
+            };
+            
+            const entry = document.createElement('div');
+            entry.className = 'text-sm text-base-content/50 flex items-center gap-2';
+            entry.innerHTML = `
+                <span class="w-2 h-2 rounded-full ${colors[type]}"></span>
+                <span class="text-base-content/40 text-xs">${new Date().toLocaleTimeString()}</span>
+                ${message}
+            `;
+            
+            elements.activityLog.insertBefore(entry, elements.activityLog.firstChild);
+            
+            // Keep only last 10 entries
+            while (elements.activityLog.children.length > 10) {
+                elements.activityLog.removeChild(elements.activityLog.lastChild);
+            }
+        }
+
+        function updateUI(gpioState) {
+            const isOn = gpioState === 1;
+            
+            // Update state display
+            elements.stateDisplay.textContent = isOn ? 'HIGH' : 'LOW';
+            elements.stateDisplay.className = `stat-value ${isOn ? 'text-success' : 'text-error'}`;
+            
+            // Update button
+            elements.button.className = `btn btn-circle btn-lg w-24 h-24 text-2xl transition-all duration-300 hover:scale-105 active:scale-95 ${isOn ? 'btn-success status-on' : 'btn-error'}`;
+            
+            // Update label
+            elements.toggleLabel.textContent = isOn ? 'GPIO is ON' : 'GPIO is OFF';
+            elements.toggleLabel.className = `badge badge-lg ${isOn ? 'badge-success' : 'badge-error'}`;
+        }
+
+        // API Functions
         async function refreshStatus() {
             try {
                 const res = await fetch('/api/status');
                 if (!res.ok) return;
-                const s = await res.json();
-
-                stateDisplay.textContent = s.gpio_state;
-                button.textContent = `Turn ${s.gpio_state === 1 ? 'ON' : 'OFF'}`;
+                const data = await res.json();
+                
+                if (data.gpio_state !== state.gpioState) {
+                    state.gpioState = data.gpio_state;
+                    updateUI(state.gpioState);
+                }
             } catch (e) {
-                console.error('status poll failed', e);
+                console.error('Status poll failed:', e);
             }
         }
-        button.addEventListener('click', async () => {
-            if (busy) return;
-            busy = true;
 
-            // const endpoint = isOn ? '/off' : '/on';
+        async function toggleGPIO() {
+            if (state.busy) return;
+            state.busy = true;
+            
+            elements.button.classList.add('loading');
+            addActivityLog('Toggling GPIO...', 'info');
+            
             try {
-                await fetch("/toggle");
+                await fetch('/toggle');
+                await refreshStatus();
+                addActivityLog(`GPIO set to ${state.gpioState === 1 ? 'HIGH' : 'LOW'}`, 'success');
             } catch (err) {
-                console.error('Toggle failed', err);
+                console.error('Toggle failed:', err);
+                addActivityLog('Toggle failed!', 'error');
             } finally {
-                busy = false;
-                refreshStatus();
+                state.busy = false;
+                elements.button.classList.remove('loading');
             }
+        }
+
+        // Update uptime
+        function updateUptime() {
+            const elapsed = Date.now() - state.startTime;
+            elements.uptime.textContent = formatTime(elapsed);
+        }
+
+        // Theme toggle
+        elements.themeToggle.addEventListener('change', (e) => {
+            document.documentElement.setAttribute('data-theme', e.target.checked ? 'light' : 'dracula');
         });
 
+        // Event Listeners
+        elements.button.addEventListener('click', toggleGPIO);
+
+        // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             refreshStatus();
             setInterval(refreshStatus, 2000);
+            setInterval(updateUptime, 1000);
+            addActivityLog('Dashboard initialized', 'success');
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
         });
     </script>
-
 </body>
 
 </html>
