@@ -8,10 +8,9 @@
 
 {
   imports = [
+    ./env.nix
     ./packages.nix
   ];
-
-  env.GREET = "devenv";
 
   # languages.rust.enable = true;
 
