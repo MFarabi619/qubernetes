@@ -5,16 +5,75 @@ Project submission for [[https://2026.uottahack.ca][uOttaHack 8]], hosted Januar
 
 ** Inspiration
 
+As our demands for computing skyrocket with the explosion of AI/ML workloads in the cloud, so does the impact on our planet.
+
+    While AI/ML may be all the rage nowadays, statistics show that we're destroying our planet at an alarming rate.
+
+    According to ... the overwhelming majority of the modern internet is made up static websites that get x amount of traffic.
+
+    Since 2023, Canada has fallen short of its goals by x amount.
+
+
+    All is not lost however. Throughout tinkering with firmware development on little ESP32s, we discovered that they're capable of:
+      - hosting full-blown web servers
+      - handling various HTTPS requests
+      - running real-time operating systems
+      - and much more...
+
+    We wondered, what if you followed the same best practices and architectures as large-scale data centers, and applied them to microcontrollers?
+
+    The high demand for compute paired with the heavy constraints of embedded systems presented a challenge for us that was both hilarious and technically ludicrous.
+
 ** What it does
+
+Qubernetes' name is inspired by the combination of the names '[[https://qnx.software/en][QNX]]' and '[[https://kubernetes.io][Kubernetes]]'. It aims to be a simple orchestrator for resource-constrained
 
 ** How we built it
 
+   We followed a first principles approach and began by addressing problems we faced ourselves, such as:
+
+    - Hosting our own websites
+    - Having API endpoints behind domains we could hit infinitely without incurring cloud costs, and closing the gap between production and staging environments
+    - File conversion without the wait times and limited usages
+
 ** Challenges we ran into
+
+    We had the following hardware in stock:
+     - Microcontrollers
+       - [[https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/index.html][ESP32-S3-DevKitC-1]]
+      - [[https://www.seeedstudio.com/XIAO-ESP32S3-p-5627.html][Seeed Studio XIAO ESP32-S3]]
+
+     - General-purpose Servers
+       - [[https://www.raspberrypi.com/products/raspberry-pi-5/][Raspberry Pi 5 - 16GB RAM]]
+       - [[https://www.raspberrypi.com/products/raspberry-pi-5/][Raspberry Pi 5 - 4GB RAM]]
+       - [[https://www.raspberrypi.com/products/raspberry-pi-4-model-b/][Raspberry Pi 4B - 4GB RAM]]
+       - [[https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/][Raspberry Pi Zero 2W]] x 2
+
+     These microcontrollers have a very limited amount of flash memory (8-16MB), ....
+
+     While the Raspberry Pi 4B and 5 series punch way above their weight in terms of how many containers they're able to host, the Zero 2W series would regularly overheat to 65°C and shut down; thus requiring us to install heatsinks onto them with thermal paste.
+
+    Other issues we had:
+    - Network debugging
+    - Provisioning DNS locally
+        - Corrupted images due to human error while flashing SD cards
+        - Namespacing hosts on our fleet in a manner that allowed us to scale without having to memorize IP addresses
 
 ** Accomplishments that we’re proud of
 
+   - Using existing open-source tools to bring our idea to life with the least amount of effort for the most amount of impact
+   - Actually using it for our own needs
+    - Curbing network architecture complexity with diagrams
+    - Recognizing areas of high complexity early, and splitting up domains of ownership according to skillsets to de-risk uncertainties
+
 ** What we learned
 
+   - How to program firmware on the QNX RTOS.
+   - Working with Docker Compose for container orchestration using [[https://dokploy.com][Dokploy]].
+    - Provisioning Infrastructure-as-Code with [[https://www.pulumi.com][Pulumi]]
+    - Code is a liability, not an asset. You don't have to build everything from scratch yourself to achieve your goals. Throwing configuration code at the problem instead of feature code can be enormously effective during the early ideation phases of the product development cycle.
+
+** Contributors
 
 [[https://www.linkedin.com/in/joey-issa][Joey Issa]]
 https://github.com/oZep
@@ -30,17 +89,17 @@ https://github.com/mfarabi619
 https://github.com/TheBigHummusMan
 
 
-Built With:
+** Built with
 
 [[https://penpot.app][Penpot]]
-Dokploy
-Dietpi
-Arch Linux
-FreeBSD
-Go
+  [[https://dokploy.com][Dokploy]]
+[[https://dietpi.com][Dietpi]]
+[[https://archlinux.org][Arch Linux]]
+[[https://www.freebsd.org][FreeBSD]]
+[[https://go.dev][Go]]
 macOS
 Nix
-Nixos
+NixOS
 raspberry-pi
 c
 c++
