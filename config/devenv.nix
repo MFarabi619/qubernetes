@@ -14,6 +14,7 @@
     ./languages
   ];
 
+  # git-hooks.hooks.shellcheck.enable = true;
   # processes.dev.exec = "${lib.getExe pkgs.watchexec} -n -- ls -la";
 
   # services.postgres.enable = true;
@@ -36,6 +37,4 @@
     echo "Running tests"
     git --version | grep --color=auto "${pkgs.git.version}"
   '';
-
-  # git-hooks.hooks.shellcheck.enable = true;
 }
