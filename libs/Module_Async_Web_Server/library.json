@@ -1,0 +1,39 @@
+{
+  "$schema": "https://raw.githubusercontent.com/platformio/platformio-core/develop/platformio/assets/schema/library.json",
+  "version": "0.0.1",
+  "license": "LGPL-3.0",
+  "frameworks": "arduino",
+  "platforms": "espressif32",
+  "name": "Module_Async_Web_Server",
+  "authors": {
+    "name": "Mumtahin Farabi",
+    "url": "https://github.com/MFarabi619",
+    "maintainer": true
+  },
+  "dependencies": [
+    {
+      "owner": "esp32async",
+      "name": "ESPAsyncWebServer",
+      "version": "^3.9.0",
+      "platforms": [
+        "*"
+      ]
+    },
+    {
+      "owner": "bblanchon",
+      "name": "ArduinoJson",
+      "version": "^7.4.2",
+      "platforms": [
+        "*"
+      ]
+    },
+    {
+      "owner": "ayushsharma82",
+      "name": "WebSerial",
+      "version": "^2.1.2",
+      "platforms": [
+        "*"
+      ]
+    }
+  ]
+}
