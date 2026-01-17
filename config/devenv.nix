@@ -10,9 +10,9 @@
   imports = [
     ./env.nix
     ./packages.nix
-  ];
 
-  # languages.rust.enable = true;
+    ./languages
+  ];
 
   # processes.dev.exec = "${lib.getExe pkgs.watchexec} -n -- ls -la";
 
