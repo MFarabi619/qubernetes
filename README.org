@@ -17,18 +17,14 @@ Project submission for [[https://2026.uottahack.ca][uOttaHack 8]], hosted Januar
 
 
 [[https://www.linkedin.com/in/joey-issa][Joey Issa]]
-
 https://github.com/oZep
 
-
-[[https://github.com/UnknownCrafts][Surya Vasudev]]
-https://www.linkedin.com/in/surya-vasudev/
-
+[[https://www.linkedin.com/in/surya-vasudev/][Surya Vasudev]]
+https://github.com/UnknownCrafts
 
 [[https://www.linkedin.com/in/mfarabi/][Mumtahin Farabi]]
 https://github.com/mfarabi619
 [[https://carleton.ca][Carleton University]]
-
 
 [[https://www.linkedin.com/in/ethan-michael-c/][Ethan Michael]]
 https://github.com/TheBigHummusMan
