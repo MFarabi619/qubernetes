@@ -1,0 +1,53 @@
+* Qubernetes
+An attempt at building the world's smallest data center out of microcontrollers.
+
+Project submission for [[https://2026.uottahack.ca][uOttaHack 8]], hosted January 16-18, 2026 at the [[https://www.uottawa.ca/en][University of Ottawa]].
+
+** Inspiration
+
+** What it does
+
+** How we built it
+
+** Challenges we ran into
+
+** Accomplishments that we’re proud of
+
+** What we learned
+
+
+[[https://www.linkedin.com/in/joey-issa][Joey Issa]]
+
+https://github.com/oZep
+
+
+[[https://github.com/UnknownCrafts][Surya Vasudev]]
+https://www.linkedin.com/in/surya-vasudev/
+
+
+[[https://www.linkedin.com/in/mfarabi/][Mumtahin Farabi]]
+https://github.com/mfarabi619
+[[https://carleton.ca][Carleton University]]
+
+
+[[https://www.linkedin.com/in/ethan-michael-c/][Ethan Michael]]
+https://github.com/TheBigHummusMan
+
+
+Built With:
+
+[[https://penpot.app][Penpot]]
+Dokploy
+Dietpi
+Arch Linux
+FreeBSD
+Go
+macOS
+Nix
+Nixos
+raspberry-pi
+c
+c++
+grafana
+tailscale
+redbull
