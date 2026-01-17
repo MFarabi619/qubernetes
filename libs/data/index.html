@@ -1,13 +1,12 @@
 <!doctype html>
-<html class="no-js" lang="">
+<html lang="en" data-theme="dracula">
 
 <head>
-      <meta charset="utf-8">
+    <meta charset="utf-8">
     <title>Qubernetes</title>
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 
-    <link rel="icon"
-        href="https://avatars.githubusercontent.com/u/29576842?s=200&v=4">
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/29576842?s=200&v=4">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -17,8 +16,62 @@
 <body>
     <main class="pt-24">
 
-Hello World!
+        Hello World!
+        <div class="mt-4">
+            <button id="toggle-btn" class="btn btn-primary w-full">Turn ON</button>
+        </div>
+
+        <div
+            class="mx-auto my-20 self-center mockup-browser border border-base-300 max-w-3xl lg:max-w-7xl min-h-screen">
+            <div class="mockup-browser-toolbar">
+                <div class="input">http://localhost/webserial</div>
+            </div>
+
+            <iframe src="/webserial" class="w-full min-h-screen" title="Web Serial" allowfullscreen="true"
+                loading="lazy">
+            </iframe>
+        </div>
+
     </main>
-        </body>
+    <script>
+        const button = document.getElementById('toggle-btn');
+        const stateDisplay = document.getElementById('state-display');
+
+        let busy = false;
+
+        async function refreshStatus() {
+            try {
+                const res = await fetch('/api/status');
+                if (!res.ok) return;
+                const s = await res.json();
+
+                stateDisplay.textContent = s.gpio_state;
+                button.textContent = `Turn ${s.gpio_state === 1 ? 'ON' : 'OFF'}`;
+            } catch (e) {
+                console.error('status poll failed', e);
+            }
+        }
+        button.addEventListener('click', async () => {
+            if (busy) return;
+            busy = true;
+
+            // const endpoint = isOn ? '/off' : '/on';
+            try {
+                await fetch("/toggle");
+            } catch (err) {
+                console.error('Toggle failed', err);
+            } finally {
+                busy = false;
+                refreshStatus();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshStatus();
+            setInterval(refreshStatus, 2000);
+        });
+    </script>
+
+</body>
 
 </html>
