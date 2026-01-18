@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  grafana:
+    image: grafana/grafana
+    restart: unless-stopped
+    environment:
+      - GF_SERVER_ENABLE_GZIP=true
+      - GF_PUBLIC_DASHBOARDS_ENABLED=true
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    networks:
+      - qnxetes-grafana-rknuh0
+    labels:
+      - traefik.http.routers.qnxetes-grafana-rknuh0-1-web.rule=Host(`10.0.0.198`)
+      - traefik.http.routers.qnxetes-grafana-rknuh0-1-web.entrypoints=web
+      - traefik.http.services.qnxetes-grafana-rknuh0-1-web.loadbalancer.server.port=3000
+      - traefik.http.routers.qnxetes-grafana-rknuh0-1-web.service=qnxetes-grafana-rknuh0-1-web
+      - traefik.enable=true
+volumes:
+  grafana-storage: {}
+networks:
+  qnxetes-grafana-rknuh0:
+    name: qnxetes-grafana-rknuh0
+    external: true
