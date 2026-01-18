@@ -9,32 +9,49 @@ As our demands for computing skyrocket with the explosion of AI/ML workloads in 
 
     While AI/ML may be all the rage nowadays, statistics show that we're destroying our planet at an alarming rate.
 
-    According to ... the overwhelming majority of the modern internet is made up static websites that get x amount of traffic.
+    According to [[https://arxiv.org/abs/2404.17095][The Web unpacked: a quantitative analysis of global Web usage by Cornell University]], the overwhelming majority of the modern internet is made up static websites that get very little consistent traffic.
 
-    Since 2023, Canada has fallen short of its goals by x amount.
-
+    Canada is also [[https://www.pbo-dpb.ca/en/publications/RP-2526-021-S--estimating-canada-2030-emissions-gap--estimation-ecart-cible-emissions-canada-2030][projected]] to fall short of its legislated emissions target set for 2030 by at least 40%.
 
     All is not lost however. Throughout tinkering with firmware development on little ESP32s, we discovered that they're capable of:
       - hosting full-blown web servers
-      - handling various HTTPS requests
+      - serve various HTTP requests (with sane tradeoffs)
       - running real-time operating systems
+      - orchestrate small workloads
       - and much more...
 
     We wondered, what if you followed the same best practices and architectures as large-scale data centers, and applied them to microcontrollers?
 
     The high demand for compute paired with the heavy constraints of embedded systems presented a challenge for us that was both hilarious and technically ludicrous.
 
+    So we tried applying “data center thinking” (service discovery, health checks, observability, staging vs prod parity) to hardware that has no business doing any of that.
+
 ** What it does
 
-Qubernetes' name is inspired by the combination of the names '[[https://qnx.software/en][QNX]]' and '[[https://kubernetes.io][Kubernetes]]'. It aims to be a simple orchestrator for resource-constrained
+Qubernetes' name is inspired by the combination of the names '[[https://qnx.software/en][QNX]]' and '[[https://kubernetes.io][Kubernetes]]'. It aims to be a tiny orchestrator / control plane for resource-constrained nodes (MCUs + small SBCs), designed for:
+
+- hosting static websites and small internal tools
+- exposing tiny API endpoints behind stable DNS
+- routing requests across a “fleet” of heterogeneous devices
+- keeping services up with health checks + restart policies
+- making “staging vs prod” less painful (even when prod is a pile of boards on your desk)
+
+Think “baby Kubernetes,” except the cluster might have less storage than a single JPEG.
 
 ** How we built it
 
-   We followed a first principles approach and began by addressing problems we faced ourselves, such as:
+We followed a first principles approach and began by addressing problems we faced ourselves, such as:
+  - Hosting our own websites
+  - Having API endpoints behind domains we could hit infinitely without incurring cloud costs, and closing the gap between production and staging environments
+  - File conversion without the wait times and limited usages
 
-    - Hosting our own websites
-    - Having API endpoints behind domains we could hit infinitely without incurring cloud costs, and closing the gap between production and staging environments
-    - File conversion without the wait times and limited usages
+We also
+  - Reverse proxy + clean domains so we weren’t memorizing IPs
+  - Raspberry Pis run the heavier stuff (dashboards, routing, infra glue), /Container orchestration on SBCs/
+  - Docker Compose via [[https://dokploy.com][Dokploy]] to ship faster
+  - Worked on DNS + naming conventions so the fleet could scale without becoming a spreadsheet nightmare
+  - Did firmware work targeting QNX RTOS for the embedded side
+  - Treated MCU services as “deployable units” with strict budgets (RAM/flash/network)
 
 ** Challenges we ran into
 
@@ -49,7 +66,14 @@ Qubernetes' name is inspired by the combination of the names '[[https://qnx.soft
        - [[https://www.raspberrypi.com/products/raspberry-pi-4-model-b/][Raspberry Pi 4B - 4GB RAM]]
        - [[https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/][Raspberry Pi Zero 2W]] x 2
 
-     These microcontrollers have a very limited amount of flash memory (8-16MB), ....
+     These microcontrollers have a very limited amount of flash memory (8-16MB).
+
+     That “8–16MB flash” budget means:
+      - you don’t “just add dependencies”
+      - you don’t “just log everything”
+      - you don’t “just ship a bigger binary”
+
+     You get one shot, and the MCU will absolutely humble you.
 
      While the Raspberry Pi 4B and 5 series punch way above their weight in terms of how many containers they're able to host, the Zero 2W series would regularly overheat to 65°C and shut down; thus requiring us to install heatsinks onto them with thermal paste.
 
@@ -61,19 +85,22 @@ Qubernetes' name is inspired by the combination of the names '[[https://qnx.soft
 
 ** Accomplishments that we’re proud of
 
-   - Using existing open-source tools to bring our idea to life with the least amount of effort for the most amount of impact
-   - Actually using it for our own needs
-    - Curbing network architecture complexity with diagrams
-    - Recognizing areas of high complexity early, and splitting up domains of ownership according to skillsets to de-risk uncertainties
+   - Using existing open-source tools to bring our idea to life with the least amount of effort for the most amount of impact.
+   - Actually using it for our own needs.
+    - Curbing network architecture complexity with diagrams.
+    - Recognizing areas of high complexity early, and splitting up domains of ownership according to skillsets to de-risk uncertainties.
 
 ** What we learned
 
    - How to program firmware on the QNX RTOS.
    - Working with Docker Compose for container orchestration using [[https://dokploy.com][Dokploy]].
-    - Provisioning Infrastructure-as-Code with [[https://www.pulumi.com][Pulumi]]
-    - Code is a liability, not an asset. You don't have to build everything from scratch yourself to achieve your goals. Throwing configuration code at the problem instead of feature code can be enormously effective during the early ideation phases of the product development cycle.
+    - Provisioning Infrastructure-as-Code with [[https://www.pulumi.com][Pulumi]].
+    - Code is a liability, not an asset. You don't have to build everything from scratch yourself to achieve your goals. Throwing configuration code at the problem instead of feature code for a bespoke system can be enormously effective during the early ideation phases of the product development cycle.
 
 ** Contributors
+
+[[https://www.linkedin.com/in/ethan-michael-c/][Ethan Michael]]
+https://github.com/TheBigHummusMan
 
 [[https://www.linkedin.com/in/joey-issa][Joey Issa]]
 https://github.com/oZep
@@ -85,10 +112,6 @@ https://github.com/UnknownCrafts
 https://github.com/mfarabi619
 [[https://carleton.ca][Carleton University]]
 
-[[https://www.linkedin.com/in/ethan-michael-c/][Ethan Michael]]
-https://github.com/TheBigHummusMan
-
-
 ** Built with
 
 [[https://penpot.app][Penpot]]
@@ -97,12 +120,11 @@ https://github.com/TheBigHummusMan
 [[https://archlinux.org][Arch Linux]]
 [[https://www.freebsd.org][FreeBSD]]
 [[https://go.dev][Go]]
-macOS
-Nix
-NixOS
-raspberry-pi
-c
-c++
-grafana
-tailscale
-redbull
+[[https://en.wikipedia.org/wiki/MacOS#Release_history][macOS]]
+[[https://nixos.org][Nix]]
+[[https://nixos.org][NixOS]]
+[[https://www.raspberrypi.com][raspberry-pi]]
+[[https://en.wikipedia.org/wiki/C_(programming_language)][c]]
+[[https://en.wikipedia.org/wiki/C%2B%2B][c++]]
+[[https://grafana.com][grafana]]
+[[https://www.redbull.com/ca-en][redbull]]
