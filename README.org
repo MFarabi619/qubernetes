@@ -53,6 +53,16 @@ We also
   - Did firmware work targeting QNX RTOS for the embedded side
   - Treated MCU services as “deployable units” with strict budgets (RAM/flash/network)
 
+*** QNX Metric Gathering
+
+    Running a custom C-based HTTP server on a QNX device that parses real-time system and buffers them in memory. This server exposes a Grafana-compatible JSON API, allowing the dashboard to visualize historical CPU and memory data directly without needing an external database or correct system time.
+
+*** Minecraft on QNX Pi
+
+    Ported a Rust based Minecraft server into QNX and got it running to allow multiple people to join from within the same network
+
+
+
 ** Challenges we ran into
 
     We had the following hardware in stock:
@@ -89,6 +99,8 @@ We also
    - Actually using it for our own needs.
     - Curbing network architecture complexity with diagrams.
     - Recognizing areas of high complexity early, and splitting up domains of ownership according to skillsets to de-risk uncertainties.
+
+  -  Making Minecraft run on QNX Pis
 
 ** What we learned
 
