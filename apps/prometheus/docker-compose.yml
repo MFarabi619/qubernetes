@@ -1,0 +1,29 @@
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    restart: unless-stopped
+    ports:
+      - 9090:9090
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/usr/share/prometheus/console_libraries
+      - --web.console.templates=/usr/share/prometheus/consoles
+      - --web.enable-lifecycle
+    volumes:
+      - prometheus-data:/prometheus
+    networks:
+      - qnxetes-prometheus-o3qk9m
+    labels:
+      - traefik.http.routers.qnxetes-prometheus-o3qk9m-5-web.rule=Host(`prometheus.localhost`)
+      - traefik.http.routers.qnxetes-prometheus-o3qk9m-5-web.entrypoints=web
+      - traefik.http.services.qnxetes-prometheus-o3qk9m-5-web.loadbalancer.server.port=9090
+      - traefik.http.routers.qnxetes-prometheus-o3qk9m-5-web.service=qnxetes-prometheus-o3qk9m-5-web
+      - traefik.enable=true
+volumes:
+  prometheus-data: {}
+networks:
+  qnxetes-prometheus-o3qk9m:
+    name: qnxetes-prometheus-o3qk9m
+    external: true
+
